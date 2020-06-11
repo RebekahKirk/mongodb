@@ -1,25 +1,55 @@
-//models folder - schema store
-//user.js - schema - structure for our database
-// - what should our user db look like
-// - should it have email, name, password, ashoe size
+const express = require('express');
+const hbs = require('express-handlebars');
+const path = require('path');
+const bodyParser = require('body-parser');
+const app = express();
 
-//index.js - data that we want to add to our schema
+require('dotenv').config();
 
-//mongoDB - mongoose - $ npm i mongoose
-//$npm i dotenv
-require('dotenv').config(); // This is where you are going to store the information so it must be called upon first
 const mongoose = require('mongoose');
-const User = require('./models/user');
-
+const User = require ('./models/user');
+const Movies = require ('./models/movies');
 mongoose.connect(`${process.env.databaseURL}`, {
     useNewUrlParser: true,
     useUnifiedTopology: true
 })
 
-const dean = new User({
-    name: 'Dean',
-    email: 'deansingleton@dean.com',
-    password: 'ilovejacob'
-}) // Creates Dean as a user
-
-dean.save(); // Saves the user Dean to the database
+app.use(bodyParser.urlencoded({extended: false})); //take everyhting as a string
+app.use(bodyParser.json()); // get it as json format
+app.use(express.static(path.join(__dirname, 'public'))); //style.css
+app.engine('.hbs', hbs({
+    defaultLayout: 'layout',
+    extname: 'hbs'
+}))
+app.set('view engine', '.hbs');
+app.get ('/', async (req, res) => {
+    res.render('index');
+});
+app.get ('/movies', async (req, res) => {
+    res.render('movies');
+});
+app.post('/', async (req,res)=> {
+    let { name, email, password} = req.body;
+    const user = new User ({
+        name,
+        email,
+        password
+    })
+    await user.save();
+    res.redirect('/');
+})
+app.post('/movies', async (req, res) => {
+    let { movieName, actor, releaseDate, rating, stream } = req.body;
+    const movies = new Movies({
+    movieName,
+    actor,
+    releaseDate,
+    rating,
+    stream
+    })
+    await movies.save();
+    res.redirect('movies');
+})
+app.listen(3005, () => {
+    console.log('I am listening on 3005');
+})

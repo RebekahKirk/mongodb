@@ -1,0 +1,9 @@
+<h1>Search Page</h1>
+{{errorMessage}}
+<form action = "/search" method="post">
+    <input type="text" name ="movieName" placeholder="Search by title...">
+    <input type="submit" value="submit">
+</form>
+<br>
+<p>{{data.movieName}}</p>
+<p>{{data.actor}}</p>
